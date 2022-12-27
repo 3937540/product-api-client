@@ -46,4 +46,17 @@ public class ProductController {
 		return service.addProduct(requestDTO);
 		
 	}
+	
+	@PostMapping(path = "/addproduct_h2")
+	public String addProductH2(@RequestBody RequestDTO requestDTO) {
+		
+		try {
+			service.addProductH2(requestDTO);
+		}catch(Exception ex) {
+			return "Exception occured";
+		}
+		return "Product saved successfully";
+		
+	}
+
 }

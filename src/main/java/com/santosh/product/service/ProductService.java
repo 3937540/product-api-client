@@ -19,4 +19,6 @@ public interface ProductService {
 	ResponseDTO getProductWithParam();
 
 	ResponseInfo addProduct(RequestDTO requestDTO);
+
+	void addProductH2(RequestDTO requestDTO);
 }

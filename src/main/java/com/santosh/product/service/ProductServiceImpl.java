@@ -20,12 +20,17 @@ import com.santosh.product.dto.ProductsResponse;
 import com.santosh.product.dto.RequestDTO;
 import com.santosh.product.dto.ResponseDTO;
 import com.santosh.product.dto.ResponseInfo;
+import com.santosh.product.entity.ProductDetail;
+import com.santosh.product.repository.ProductRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class ProductServiceImpl implements ProductService {
+	
+	@Autowired
+	private ProductRepository repository;
 	
 	@Autowired
 	private RestTemplate restTemplate;
@@ -139,5 +144,17 @@ public class ProductServiceImpl implements ProductService {
 			//throw custom exception.
 		}
 		return response;
+	}
+
+	@Override
+	public void addProductH2(RequestDTO requestDTO) {
+		
+		ProductDetail product = new ProductDetail();
+		product.setProductNm(requestDTO.getProductName());
+		product.setProductPrc(requestDTO.getProductPrice());
+		product.setProductQty(requestDTO.getProductQuantity());
+		
+		repository.save(product);
+		log.info("Product details saved into H2 DB.");
 	}
 }
