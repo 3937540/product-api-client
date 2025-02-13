@@ -1,9 +1,9 @@
 package com.santosh.product.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.santosh.product.dto.EmployeeDetail;
+import com.santosh.product.service.EmployeeService;
+import org.springframework.web.bind.annotation.*;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,9 @@ public class ProductController {
 	
 	@Autowired
 	ProductService service;
+
+	@Autowired
+	EmployeeService empService;
 	
 	@GetMapping(path = "/getallproducts")
 	public List<ResponseInfo> getAllProducts() {
@@ -57,6 +60,12 @@ public class ProductController {
 		}
 		return "Product saved successfully";
 		
+	}
+
+	@GetMapping(path = "/getemployee", produces = {APPLICATION_JSON_VALUE})
+	public EmployeeDetail getEmployee(@RequestParam(value = "empid") final String empid){
+
+		return empService.getEmployee(empid);
 	}
 
 }

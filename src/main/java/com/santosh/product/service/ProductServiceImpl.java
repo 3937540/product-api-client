@@ -1,5 +1,6 @@
 package com.santosh.product.service;
 
+import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,6 +10,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -100,6 +104,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Retryable(value = {IllegalStateException.class, ConnectException.class}, maxAttemptsExpression = "#{${retry.max.attempts}}", backoff = @Backoff(delayExpression = "#{${retry.backoff.ms}}"))
 	public ResponseDTO getProductWithParam() {
 		ResponseDTO response = null;
 		try {
@@ -118,6 +123,14 @@ public class ProductServiceImpl implements ProductService {
 		}catch(Exception ex) {
 			
 		}
+		return response;
+	}
+	
+	//Return type of recover method and actual method should be same.
+	@Recover
+	public ResponseDTO recoverMethod() {
+		ResponseDTO response = new ResponseDTO();
+		//Set response values and return.
 		return response;
 	}
 
