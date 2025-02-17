@@ -6,6 +6,7 @@ import com.santosh.product.dto.EmployeeDetails;
 import com.santosh.product.dto.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +22,11 @@ public class EmployeeService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+
+    @Qualifier(value = "restTemplateWithTimeout")
+    @Autowired
+    private RestTemplate timeOutRestTemplate;
 
     public EmployeeDetail getEmployee(String empid){
         EmployeeDetail empDtls = new EmployeeDetail();
@@ -59,7 +65,7 @@ public class EmployeeService {
                     .queryParam("empid", empid);
             log.info("Request URL with request params: {}", builder.toUriString());
             log.info("getEmployeeDeptAndSal API called by thread, {}", Thread.currentThread().getName());
-            ResponseEntity<EmployeeDeptDetails> responseEntity = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, EmployeeDeptDetails.class);
+            ResponseEntity<EmployeeDeptDetails> responseEntity = timeOutRestTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, EmployeeDeptDetails.class);
             response = responseEntity.getBody();
             log.info("Response With Headers: {}", response);
             log.info("getEmployeeDeptAndSal API responded by thread, {}", Thread.currentThread().getName());
@@ -91,5 +97,27 @@ public class EmployeeService {
         }
 
         return response;
+    }
+
+    public String testTimeOut(String name) {
+
+        String response = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8091/product-api/employee/testtimeout")
+                    .queryParam("name", name);
+            ResponseEntity<String> responseEntity = timeOutRestTemplate.exchange(builder.toUriString(),HttpMethod.GET, entity, String.class);
+            response = responseEntity.getBody();
+            log.info("Response With Headers: {}", response);
+        }catch(Exception ex) {
+        log.error("Exception occured, {}", ex.getMessage());
+        response = "Error";
+        }
+        return response;
+
+
     }
 }
